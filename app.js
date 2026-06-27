@@ -519,6 +519,23 @@
         return ` (+${diff.toFixed(1)}% margem)`;
     }
 
+    function atualizarMargemCardRealTime(card, id) {
+        const inputP1 = card.querySelector(`#p1-${id}`);
+        const inputPv = card.querySelector(`#pv-${id}`);
+        const margemEl = card.querySelector(`#margem-tempo-real-${id}`);
+        if (!margemEl || !inputP1 || !inputPv) return;
+
+        const c = paraNumero(inputP1.value);
+        const v = paraNumero(inputPv.value);
+        if (c > 0 && v > 0) {
+            const diff = ((v - c) / c) * 100;
+            margemEl.querySelector('.txt-margem').textContent = `+${diff.toFixed(1)}%`;
+            margemEl.style.display = 'block';
+        } else {
+            margemEl.style.display = 'none';
+        }
+    }
+
     function formatarMoeda(valor) {
         if (isNaN(valor) || valor === null) valor = 0;
         return valor.toLocaleString('pt-BR', {
@@ -642,7 +659,8 @@
             </div>
 
             <div class="grupo-preco grupo-1">
-                <h3>Preço de custo esperado (referência)</h3>
+                <h3>Preços Esperados (Referência)</h3>
+                
                 <div class="campo">
                     <label class="campo-label" for="p1-${produto.id}">Preço unitário de custo 1</label>
                     <div class="campo-input-container com-prefixo">
@@ -659,8 +677,30 @@
                         >
                     </div>
                 </div>
-                <div class="subtotal-bloco">
-                    <span class="subtotal-label">Subtotal 1</span>
+
+                <div class="campo" style="margin-top: 0.75rem;">
+                    <label class="campo-label" for="pv-${produto.id}">Preço unitário de venda 1</label>
+                    <div class="campo-input-container com-prefixo">
+                        <span class="input-prefixo">R$</span>
+                        <input
+                            type="text"
+                            inputmode="decimal"
+                            id="pv-${produto.id}"
+                            class="campo-input"
+                            data-campo="precoVenda"
+                            placeholder="8,50"
+                            value="${produto.precoVenda || ''}"
+                            ${isSalvo ? 'disabled' : ''}
+                        >
+                    </div>
+                </div>
+
+                <div id="margem-tempo-real-${produto.id}" style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-top: 0.5rem; display: none;">
+                    Margem calculada: <span class="txt-margem" style="color: var(--primary);">+0%</span>
+                </div>
+
+                <div class="subtotal-bloco" style="margin-top: 0.875rem;">
+                    <span class="subtotal-label">Subtotal Custo</span>
                     <span class="subtotal-valor" data-saida="subtotal1">${formatarMoeda(calcSubtotal(produto.preco1, produto.quantidade))}</span>
                 </div>
             </div>
@@ -671,6 +711,11 @@
                 </button>
             </div>
         `;
+
+        // Executa o cálculo da margem se os valores já vierem preenchidos no load
+        setTimeout(() => {
+            atualizarMargemCardRealTime(card, produto.id);
+        }, 50);
 
         // Listeners dos inputs
         card.querySelectorAll('input[data-campo]').forEach(input => {
@@ -686,10 +731,13 @@
                     if (correspondencia) {
                         const custoVal = (correspondencia.precoCusto && paraNumero(correspondencia.precoCusto) > 0) ? correspondencia.precoCusto : correspondencia.preco1;
                         produto.preco1 = custoVal;
+                        produto.precoVenda = correspondencia.preco1; // Preço de venda padrão
+                        
                         const inputP1 = card.querySelector(`#p1-${produto.id}`);
-                        if (inputP1) {
-                            inputP1.value = custoVal;
-                        }
+                        const inputPv = card.querySelector(`#pv-${produto.id}`);
+                        if (inputP1) inputP1.value = custoVal;
+                        if (inputPv) inputPv.value = correspondencia.preco1;
+                        
                         if (refContainer) {
                             const margemTxt = (correspondencia.precoCusto && correspondencia.preco1) ? calcularMargem(correspondencia.precoCusto, correspondencia.preco1) : '';
                             refContainer.innerHTML = `
@@ -704,6 +752,10 @@
                             refContainer.innerHTML = '';
                         }
                     }
+                }
+
+                if (campo === 'preco1' || campo === 'precoVenda') {
+                    atualizarMargemCardRealTime(card, produto.id);
                 }
 
                 atualizarSubtotaisCard(card, produto);
@@ -927,7 +979,7 @@
         item.dataset.id = produto.id;
 
         const correspondencia = catalogo.find(item => item.nome.toLowerCase() === (produto.nome || '').trim().toLowerCase());
-        const precoVendaRef = correspondencia ? correspondencia.preco1 : null;
+        const precoVendaRef = correspondencia ? correspondencia.preco1 : (produto.precoVenda || null);
 
         const nome = produto.nome && produto.nome.trim()
             ? escaparHtml(produto.nome.trim())
