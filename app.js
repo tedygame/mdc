@@ -684,10 +684,11 @@
                     const correspondencia = catalogo.find(item => item.nome.toLowerCase() === termo);
                     const refContainer = card.querySelector(`#ref-container-${produto.id}`);
                     if (correspondencia) {
-                        produto.preco1 = correspondencia.precoCusto;
+                        const custoVal = (correspondencia.precoCusto && paraNumero(correspondencia.precoCusto) > 0) ? correspondencia.precoCusto : correspondencia.preco1;
+                        produto.preco1 = custoVal;
                         const inputP1 = card.querySelector(`#p1-${produto.id}`);
                         if (inputP1) {
-                            inputP1.value = correspondencia.precoCusto;
+                            inputP1.value = custoVal;
                         }
                         if (refContainer) {
                             const margemTxt = (correspondencia.precoCusto && correspondencia.preco1) ? calcularMargem(correspondencia.precoCusto, correspondencia.preco1) : '';
