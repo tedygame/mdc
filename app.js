@@ -511,6 +511,14 @@
 
     /* ----------- Utilidades ----------- */
 
+    function calcularMargem(custo, venda) {
+        const c = paraNumero(custo);
+        const v = paraNumero(venda);
+        if (c <= 0 || v <= 0) return '';
+        const diff = ((v - c) / c) * 100;
+        return ` (+${diff.toFixed(1)}% margem)`;
+    }
+
     function formatarMoeda(valor) {
         if (isNaN(valor) || valor === null) valor = 0;
         return valor.toLocaleString('pt-BR', {
@@ -916,6 +924,9 @@
         item.className = 'item-caderno';
         item.dataset.id = produto.id;
 
+        const correspondencia = catalogo.find(item => item.nome.toLowerCase() === (produto.nome || '').trim().toLowerCase());
+        const precoVendaRef = correspondencia ? correspondencia.preco1 : null;
+
         const nome = produto.nome && produto.nome.trim()
             ? escaparHtml(produto.nome.trim())
             : `Produto ${indice + 1}`;
@@ -932,12 +943,15 @@
 
         item.innerHTML = `
             <div class="item-cabecalho">
-                <span class="item-nome ${semNome ? 'sem-nome' : ''}">${nome}</span>
+                <div style="display: flex; flex-direction: column;">
+                    <span class="item-nome ${semNome ? 'sem-nome' : ''}">${nome}</span>
+                    ${precoVendaRef ? `<span style="font-size: 0.75rem; color: var(--text-light); font-weight: 700; margin-top: 0.125rem;">Venda ref: ${formatarMoeda(paraNumero(precoVendaRef))}</span>` : ''}
+                </div>
                 <span class="item-qtd">${qtd > 0 ? qtd + ' un' : '— un'}</span>
             </div>
             <div class="item-precos">
                 <div class="preco-bloco preco-1 ${temP1 ? '' : 'vazio'}">
-                    <div class="preco-bloco-titulo">Esperado</div>
+                    <div class="preco-bloco-titulo">Custo Esp.</div>
                     <div class="preco-unitario-pequeno">${temP1 ? formatarMoeda(p1) + '/un' : '—'}</div>
                     <div class="preco-subtotal" data-saida="caderno-sub1">${temP1 && qtd > 0 ? formatarMoeda(sub1) : '—'}</div>
                 </div>
