@@ -642,9 +642,9 @@
             </div>
 
             <div class="grupo-preco grupo-1">
-                <h3>Preço esperado (referência)</h3>
+                <h3>Preço de custo esperado (referência)</h3>
                 <div class="campo">
-                    <label class="campo-label" for="p1-${produto.id}">Preço unitário 1</label>
+                    <label class="campo-label" for="p1-${produto.id}">Preço unitário de custo 1</label>
                     <div class="campo-input-container com-prefixo">
                         <span class="input-prefixo">R$</span>
                         <input
