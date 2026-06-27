@@ -1,6 +1,6 @@
 /* Service Worker do MDC - permite uso offline */
 
-const CACHE_NOME = 'mdc-cache-v4';
+const CACHE_NOME = 'mdc-cache-v5';
 const ARQUIVOS = [
     './',
     './index.html',

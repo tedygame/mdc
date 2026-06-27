@@ -684,16 +684,17 @@
                     const correspondencia = catalogo.find(item => item.nome.toLowerCase() === termo);
                     const refContainer = card.querySelector(`#ref-container-${produto.id}`);
                     if (correspondencia) {
-                        produto.preco1 = correspondencia.preco1;
+                        produto.preco1 = correspondencia.precoCusto;
                         const inputP1 = card.querySelector(`#p1-${produto.id}`);
                         if (inputP1) {
-                            inputP1.value = correspondencia.preco1;
+                            inputP1.value = correspondencia.precoCusto;
                         }
                         if (refContainer) {
+                            const margemTxt = (correspondencia.precoCusto && correspondencia.preco1) ? calcularMargem(correspondencia.precoCusto, correspondencia.preco1) : '';
                             refContainer.innerHTML = `
-                                <div class="referencia-precos-card" style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-top: 0.5rem; margin-bottom: 0.25rem; display: flex; gap: 0.625rem; background: #f8fafc; padding: 0.375rem 0.625rem; border-radius: 8px; border: 1px solid #f1f5f9;">
-                                    ${correspondencia.precoCusto ? `<span>Custo ref: <strong style="color: var(--success);">${formatarMoeda(paraNumero(correspondencia.precoCusto))}</strong></span>` : ''}
-                                    <span>Venda ref: <strong style="color: var(--primary);">${formatarMoeda(paraNumero(correspondencia.preco1))}</strong></span>
+                                <div class="referencia-precos-card" style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-top: 0.5rem; margin-bottom: 0.25rem; display: flex; gap: 0.625rem; background: #f8fafc; padding: 0.375rem 0.625rem; border-radius: 8px; border: 1px solid #f1f5f9; flex-wrap: wrap;">
+                                    <span>Custo ref: <strong style="color: var(--success);">${formatarMoeda(paraNumero(correspondencia.precoCusto))}</strong></span>
+                                    <span>Venda ref: <strong style="color: var(--primary);">${formatarMoeda(paraNumero(correspondencia.preco1))}</strong>${margemTxt}</span>
                                 </div>
                             `;
                         }
