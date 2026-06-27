@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Loja_VWGWB5">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <title>Loja_VWGWB5</title>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-content" style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; justify-content: center;">
+            <img src="logo.png" alt="Loja_VWGWB5" style="max-height: 90px; width: auto; max-width: 100%; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));">
+            <h1 style="display: none;">Loja_VWGWB5</h1>
+            <p class="subtitle">Lista de Compras Inteligente</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- ===== MODO EDIÇÃO (em casa, montando a lista) ===== -->
+        <div id="modo-edicao">
+            <div class="barra-acoes">
+                <button id="btn-adicionar" class="btn-mini btn-mini-novo" type="button" title="Adicionar novo produto">
+                    <svg class="mini-icone" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"/></svg>
+                    <span class="mini-texto">Novo</span>
+                </button>
+
+                <button id="btn-ver-lista" class="btn-mini btn-mini-lista" type="button" title="Ver lista (modo mercado)">
+                    <svg class="mini-icone" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+                    <span class="mini-texto">Lista</span>
+                </button>
+
+                <button id="btn-soma-total" class="btn-mini btn-mini-soma" type="button" title="Calcular soma total">
+                    <svg class="mini-icone" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    <span class="mini-texto">Total</span>
+                </button>
+
+                <button id="btn-catalogo" class="btn-mini btn-mini-catalogo" type="button" title="Gerenciar catálogo de produtos">
+                    <svg class="mini-icone" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                    <span class="mini-texto">Catálogo</span>
+                </button>
+
+                <button id="btn-limpar" class="btn-mini btn-mini-limpar" type="button" title="Limpar tudo">
+                    <svg class="mini-icone" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"/></svg>
+                    <span class="mini-texto">Limpar</span>
+                </button>
+            </div>
+
+            <section id="produtos-lista" class="produtos-lista">
+                <!-- Os produtos serão adicionados aqui via JavaScript -->
+            </section>
+
+            <section id="resultado-final" class="resultado-final oculto">
+                <h2>Resultado Final</h2>
+                <div id="resultado-conteudo"></div>
+            </section>
+        </div>
+
+        <!-- ===== MODO LISTA / CADERNINHO (no mercado, anotando preço 2) ===== -->
+        <div id="modo-lista" class="oculto">
+            <div class="lista-cabecalho">
+                <button id="btn-voltar-edicao" class="btn-voltar" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="icone-voltar"><path d="m15 18-6-6 6-6"/></svg>
+                    <span>Voltar</span>
+                </button>
+                <h2>Minha Lista</h2>
+                <span class="lista-data" id="lista-data"></span>
+            </div>
+
+            <div class="caderno">
+                <!-- Anéis da espiral do caderno -->
+                <div class="espiral">
+                    <span class="anel"></span>
+                    <span class="anel"></span>
+                    <span class="anel"></span>
+                    <span class="anel"></span>
+                    <span class="anel"></span>
+                    <span class="anel"></span>
+                    <span class="anel"></span>
+                    <span class="anel"></span>
+                    <span class="anel"></span>
+                    <span class="anel"></span>
+                </div>
+
+                <div id="caderno-itens" class="caderno-itens">
+                    <!-- Itens da lista renderizados via JS -->
+                </div>
+
+                <div id="caderno-rodape" class="caderno-rodape">
+                    <!-- Totais renderizados via JS -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sistema de Diálogos/Toasts Customizados -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <div id="modal-confirmacao" class="modal-container oculto">
+        <div class="modal-overlay"></div>
+        <div class="modal-conteudo">
+            <div class="modal-cabecalho">
+                <svg class="modal-icone-aviso" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <h3>Limpar Lista</h3>
+            </div>
+            <p>Deseja salvar a lista atual no histórico de compras antes de limpá-la?</p>
+            <div class="modal-botoes-limpeza" style="display: flex; flex-direction: column; gap: 0.625rem;">
+                <button id="btn-modal-arquivar-limpar" class="btn-modal-acao-limpar btn-modal-arquivar" type="button" style="width: 100%; padding: 0.75rem; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.875rem; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; transition: all 0.2s; background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);">Salvar no Histórico e Limpar</button>
+                <button id="btn-modal-confirmar" class="btn-modal-acao-limpar btn-modal-confirmar" type="button" style="width: 100%; padding: 0.75rem; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.875rem; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; transition: all 0.2s; background: var(--danger); color: white; box-shadow: 0 4px 10px rgba(244, 63, 94, 0.2);">Apenas Limpar Tudo</button>
+                <button id="btn-modal-cancelar" class="btn-modal-cancelar" type="button" style="width: 100%; padding: 0.75rem; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.875rem; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; transition: all 0.2s; background: #f1f5f9; color: var(--text-muted);">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sugestões de autocomplete (conectadas aos inputs via JS) -->
+    <datalist id="sugestoes-produtos"></datalist>
+
+    <!-- Modal de Gerenciamento (Catálogo & Histórico) -->
+    <div id="modal-catalogo" class="modal-container oculto">
+        <div class="modal-overlay"></div>
+        <div class="modal-conteudo modal-catalogo-conteudo">
+            <div class="modal-cabecalho">
+                <svg class="modal-icone-catalogo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: var(--primary);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <h3>Gerenciar</h3>
+                <button id="btn-fechar-catalogo" class="btn-fechar-modal-x" type="button" title="Fechar">&times;</button>
+            </div>
+
+            <!-- Abas do Modal -->
+            <div class="modal-abas">
+                <button id="aba-btn-catalogo" class="aba-link ativa" type="button">Catálogo</button>
+                <button id="aba-btn-historico" class="aba-link" type="button">Histórico (Listas)</button>
+            </div>
+            
+            <!-- SEÇÃO 1: CATÁLOGO DE PRODUTOS -->
+            <div id="modal-secao-catalogo" class="modal-secao-conteudo">
+                <form id="form-cadastro-produto" class="form-cadastro-produto">
+                    <div class="campo">
+                        <label class="campo-label" for="cad-nome">Nome do Produto</label>
+                        <input type="text" id="cad-nome" class="campo-input" placeholder="Ex: Manteiga, Café, etc." required autocomplete="off">
+                    </div>
+                    <div class="campo">
+                        <label class="campo-label" for="cad-preco">Preço Esperado Padrão (R$)</label>
+                        <div class="campo-input-container com-prefixo">
+                            <span class="input-prefixo">R$</span>
+                            <input type="text" id="cad-preco" class="campo-input" placeholder="Ex: 8,50" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-cadastrar-submit">Cadastrar no Catálogo</button>
+                </form>
+
+                <div class="divisor-modal"></div>
+                
+                <div class="catalogo-cabecalho-lista" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.625rem;">
+                    <h4 style="margin-bottom: 0;">Produtos Cadastrados</h4>
+                    <button id="btn-importar-backup" class="btn-importar-backup" type="button" title="Importar produtos do backup do VWGWB5">Importar Backup (.json)</button>
+                    <input type="file" id="input-importar-backup" accept=".json" style="display: none;">
+                </div>
+                
+                <div id="catalogo-lista-itens" class="catalogo-lista-itens">
+                    <!-- Lista de produtos cadastrados via JS -->
+                </div>
+            </div>
+
+            <!-- SEÇÃO 2: HISTÓRICO DE LISTAS ANTERIORES -->
+            <div id="modal-secao-historico" class="modal-secao-conteudo oculto">
+                <h4>Listas Anteriores (Últimas 2)</h4>
+                <p style="font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.4;">
+                    Sempre que você limpa sua lista e escolhe salvar, a lista antiga é arquivada aqui.
+                </p>
+                
+                <div id="historico-lista-itens" class="historico-lista-itens" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 200px; overflow-y: auto;">
+                    <!-- Itens de listas antigas carregados via JS -->
+                </div>
+
+                <!-- Painel de visualização de detalhes da lista antiga -->
+                <div id="historico-visualizador-detalhe" class="historico-visualizador-detalhe oculto" style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1.5px dashed #cbd5e1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <h5 id="detalhe-titulo-data" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.875rem; font-weight: 800; color: var(--text-main);">Itens da lista antiga</h5>
+                        <button id="btn-fechar-detalhe" style="background: none; border: none; color: var(--danger); font-size: 0.75rem; font-weight: 700; cursor: pointer;" type="button">Fechar Detalhes</button>
+                    </div>
+                    <div id="detalhe-itens-lista" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.625rem; max-height: 140px; overflow-y: auto; font-size: 0.8125rem; display: flex; flex-direction: column; gap: 0.375rem;">
+                        <!-- JS carrega os itens da lista antiga aqui -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="app-footer">
+        <small>Loja_VWGWB5</small>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
