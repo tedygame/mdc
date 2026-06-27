@@ -98,16 +98,16 @@
     let catalogo = [];
     let itemEmEdicao = null;
     const catalogoPadrao = [
-        { nome: 'Arroz', preco1: '28,90' },
-        { nome: 'Feijão', preco1: '8,50' },
-        { nome: 'Leite', preco1: '4,60' },
-        { nome: 'Café', preco1: '16,90' },
-        { nome: 'Açúcar', preco1: '5,20' },
-        { nome: 'Óleo', preco1: '6,80' },
-        { nome: 'Manteiga', preco1: '9,80' },
-        { nome: 'Pão de Forma', preco1: '7,50' },
-        { nome: 'Sabão em Pó', preco1: '14,90' },
-        { nome: 'Detergente', preco1: '2,40' }
+        { nome: 'Arroz', preco1: '28,90', precoCusto: '20,00' },
+        { nome: 'Feijão', preco1: '8,50', precoCusto: '6,20' },
+        { nome: 'Leite', preco1: '4,60', precoCusto: '3,20' },
+        { nome: 'Café', preco1: '16,90', precoCusto: '12,50' },
+        { nome: 'Açúcar', preco1: '5,20', precoCusto: '3,80' },
+        { nome: 'Óleo', preco1: '6,80', precoCusto: '5,00' },
+        { nome: 'Manteiga', preco1: '9,80', precoCusto: '7,00' },
+        { nome: 'Pão de Forma', preco1: '7,50', precoCusto: '5,20' },
+        { nome: 'Sabão em Pó', preco1: '14,90', precoCusto: '10,50' },
+        { nome: 'Detergente', preco1: '2,40', precoCusto: '1,70' }
     ];
 
     function carregarCatalogo() {
@@ -156,7 +156,10 @@
             el.innerHTML = `
                 <div class="catalogo-item-info">
                     <span class="catalogo-item-nome">${escaparHtml(item.nome)}</span>
-                    <span class="catalogo-item-preco">Preço de referência: ${formatarMoeda(paraNumero(item.preco1))}</span>
+                    <span class="catalogo-item-preco" style="font-size: 0.75rem; color: var(--text-muted); display: flex; gap: 0.75rem; font-weight: 600; margin-top: 0.25rem;">
+                        <span>Venda: <strong style="color: var(--primary);">${formatarMoeda(paraNumero(item.preco1))}</strong></span>
+                        <span>Custo: <strong style="color: var(--success);">${formatarMoeda(paraNumero(item.precoCusto))}</strong></span>
+                    </span>
                 </div>
                 <div class="catalogo-item-acoes">
                     <button type="button" class="btn-catalogo-editar" aria-label="Editar" title="Editar produto">
@@ -182,6 +185,7 @@
         itemEmEdicao = item.nome;
         document.getElementById('cad-nome').value = item.nome;
         document.getElementById('cad-preco').value = item.preco1;
+        document.getElementById('cad-preco-custo').value = item.precoCusto || '';
 
         const btnSubmit = formCadastroProduto.querySelector('.btn-cadastrar-submit');
         btnSubmit.textContent = 'Salvar Alterações';
@@ -199,7 +203,7 @@
         btnSubmit.classList.remove('em-edicao');
     }
 
-    function cadastrarProdutoCatalogo(nome, preco1) {
+    function cadastrarProdutoCatalogo(nome, preco1, precoCusto) {
         const nomeLimpo = nome.trim();
         if (!nomeLimpo) return;
 
@@ -213,6 +217,7 @@
                 }
                 catalogo[index].nome = nomeLimpo;
                 catalogo[index].preco1 = preco1;
+                catalogo[index].precoCusto = precoCusto;
                 mostrarToast(`Produto "${nomeLimpo}" atualizado com sucesso!`, 'sucesso');
             }
             cancelarEdicaoCatalogo();
@@ -220,9 +225,10 @@
             const index = catalogo.findIndex(item => item.nome.toLowerCase() === nomeLimpo.toLowerCase());
             if (index > -1) {
                 catalogo[index].preco1 = preco1;
+                catalogo[index].precoCusto = precoCusto;
                 mostrarToast(`Preço de "${nomeLimpo}" atualizado no catálogo.`, 'sucesso');
             } else {
-                catalogo.push({ nome: nomeLimpo, preco1 });
+                catalogo.push({ nome: nomeLimpo, preco1, precoCusto });
                 mostrarToast(`"${nomeLimpo}" adicionado ao catálogo.`, 'sucesso');
             }
         }
@@ -430,7 +436,8 @@
         e.preventDefault();
         const nome = document.getElementById('cad-nome').value;
         const preco = document.getElementById('cad-preco').value;
-        cadastrarProdutoCatalogo(nome, preco);
+        const precoCusto = document.getElementById('cad-preco-custo').value;
+        cadastrarProdutoCatalogo(nome, preco, precoCusto);
     });
 
     // Importação de Backup do outro sistema
@@ -454,17 +461,27 @@
                         if (p.name && p.price !== undefined) {
                             const nomeLimpo = p.name.trim();
                             const precoReal = Number(p.price).toFixed(2).replace('.', ',');
+                            const precoCustoReal = p.costPrice !== undefined ? Number(p.costPrice).toFixed(2).replace('.', ',') : '0,00';
 
                             const idx = catalogo.findIndex(item => item.nome.toLowerCase() === nomeLimpo.toLowerCase());
                             if (idx > -1) {
+                                let mudou = false;
                                 if (catalogo[idx].preco1 !== precoReal) {
                                     catalogo[idx].preco1 = precoReal;
+                                    mudou = true;
+                                }
+                                if (catalogo[idx].precoCusto !== precoCustoReal) {
+                                    catalogo[idx].precoCusto = precoCustoReal;
+                                    mudou = true;
+                                }
+                                if (mudou) {
                                     atualizados++;
                                 }
                             } else {
                                 catalogo.push({
                                     nome: nomeLimpo,
-                                    preco1: precoReal
+                                    preco1: precoReal,
+                                    precoCusto: precoCustoReal
                                 });
                                 importados++;
                             }
@@ -474,7 +491,7 @@
                     if (importados > 0 || atualizados > 0) {
                         salvarCatalogo();
                         renderizarListaCatalogo();
-                        mostrarToast(`${importados} novos produtos importados!`, 'sucesso');
+                        mostrarToast(`${importados} importados, ${atualizados} atualizados!`, 'sucesso');
                     } else {
                         mostrarToast('Nenhum produto novo no backup.', 'info');
                     }
@@ -560,6 +577,20 @@
         card.className = `produto-card ${isSalvo ? 'estado-salvo' : ''}`;
         card.dataset.id = produto.id;
 
+        const correspondencia = catalogo.find(item => item.nome.toLowerCase() === (produto.nome || '').trim().toLowerCase());
+        const precoVendaRef = correspondencia ? correspondencia.preco1 : null;
+        const precoCustoRef = correspondencia ? correspondencia.precoCusto : null;
+
+        let informacaoPrecosHtml = '';
+        if (precoVendaRef || precoCustoRef) {
+            informacaoPrecosHtml = `
+                <div class="referencia-precos-card" style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-top: 0.5rem; margin-bottom: 0.25rem; display: flex; gap: 0.625rem; background: #f8fafc; padding: 0.375rem 0.625rem; border-radius: 8px; border: 1px solid #f1f5f9;">
+                    ${precoCustoRef ? `<span>Custo ref: <strong style="color: var(--success);">${formatarMoeda(paraNumero(precoCustoRef))}</strong></span>` : ''}
+                    ${precoVendaRef ? `<span>Venda ref: <strong style="color: var(--primary);">${formatarMoeda(paraNumero(precoVendaRef))}</strong></span>` : ''}
+                </div>
+            `;
+        }
+
         card.innerHTML = `
             <div class="produto-cabecalho">
                 <span class="produto-numero">Produto ${indice + 1}</span>
@@ -582,6 +613,7 @@
                         ${isSalvo ? 'disabled' : ''}
                     >
                 </div>
+                <div id="ref-container-${produto.id}">${informacaoPrecosHtml}</div>
             </div>
 
             <div class="campo">
@@ -642,11 +674,24 @@
                 if (campo === 'nome') {
                     const termo = e.target.value.trim().toLowerCase();
                     const correspondencia = catalogo.find(item => item.nome.toLowerCase() === termo);
+                    const refContainer = card.querySelector(`#ref-container-${produto.id}`);
                     if (correspondencia) {
                         produto.preco1 = correspondencia.preco1;
                         const inputP1 = card.querySelector(`#p1-${produto.id}`);
                         if (inputP1) {
                             inputP1.value = correspondencia.preco1;
+                        }
+                        if (refContainer) {
+                            refContainer.innerHTML = `
+                                <div class="referencia-precos-card" style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-top: 0.5rem; margin-bottom: 0.25rem; display: flex; gap: 0.625rem; background: #f8fafc; padding: 0.375rem 0.625rem; border-radius: 8px; border: 1px solid #f1f5f9;">
+                                    ${correspondencia.precoCusto ? `<span>Custo ref: <strong style="color: var(--success);">${formatarMoeda(paraNumero(correspondencia.precoCusto))}</strong></span>` : ''}
+                                    <span>Venda ref: <strong style="color: var(--primary);">${formatarMoeda(paraNumero(correspondencia.preco1))}</strong></span>
+                                </div>
+                            `;
+                        }
+                    } else {
+                        if (refContainer) {
+                            refContainer.innerHTML = '';
                         }
                     }
                 }
